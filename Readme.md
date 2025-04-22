@@ -1,6 +1,9 @@
 
 ## EMAIL CRM SYSTEM BACKEND
 
+Created this backend for allows management of email templates,
+campaigns, scheduling, and sending through mulƟple "from" email accounts.
+
 ## Technologies used in this :
 1. TYPESCRIPT
 2. NODEMAILER
