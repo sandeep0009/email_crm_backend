@@ -10,7 +10,7 @@ const create=async(
         title,
         htmlCode
     });
-    await createTemplate.save();
+
 
     return createTemplate;
 

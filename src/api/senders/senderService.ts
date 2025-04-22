@@ -15,7 +15,7 @@ const create=async(
         smtp_user,
         smtp_pass:encryptedDetail
     });
-    await new_sender.save();
+
     return new_sender;
 
 }
