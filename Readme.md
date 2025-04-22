@@ -14,6 +14,10 @@ campaigns, scheduling, and sending through mulƟple "from" email accounts.
 ## ARCHITECTURE :
 ![Screenshot](./screenshot.png)
 
+
+## ER Diagram:
+![Screenshot](./er_diagram.png)
+
 ## Installation guide :
 
 1. Clone the repo:
