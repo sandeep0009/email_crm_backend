@@ -3,45 +3,72 @@ import Template from "../models/templateSchema";
 import Senders from "../models/sendersSchema";
 import { sendEmail } from "./sendMail";
 import IORedis from "ioredis";
-import { myQueue } from "./bullmq";
-import { calculateDelay } from "./util";
+
 import mongoose from "mongoose";
 import connectionDb from "../db/connection";
+import EmailLogs from "../models/emailLogsSchema";
 
 
-const connection=new IORedis({ maxRetriesPerRequest: null });
-connectionDb().then(()=>{
-    const worker=new Worker('email_sender',async(job)=>{
+const connection = new IORedis({ maxRetriesPerRequest: null });
+connectionDb().then(() => {
+  const worker = new Worker('email_sender', async (job) => {
 
-        const { template: templates, recipients } = job.data;
+    const { template: templates, recipients } = job.data;
 
-        for(let temp of templates){
+    for (let temp of templates) {
 
-            const {template_id,sender_id}=temp;
+      const { template_id, sender_id, scheduled_time } = temp;
 
-            const template = await Template.findById(new mongoose.Types.ObjectId(template_id)).exec();
-            const sender = await Senders.findById(new mongoose.Types.ObjectId(sender_id)).exec();
-        
-            if (!template || !sender) {
-                console.error(`Template or Sender not found for template_id: ${template_id}, sender_id: ${sender_id}`);
-                continue;
-            }
-            
-    
-            const result = await sendEmail({
-                from: sender.email,
-                to: recipients,
-                subject: template.title,
-                body: template.htmlCode,
-              });
-              console.log(result);
+      const template = await Template.findById(new mongoose.Types.ObjectId(template_id)).exec();
+      const sender = await Senders.findById(new mongoose.Types.ObjectId(sender_id)).exec();
+
+      if (!template || !sender) {
+        console.error(`Template or Sender not found for template_id: ${template_id}, sender_id: ${sender_id}`);
+        continue;
+      }
+
+      try {
+        const result = await sendEmail({
+          from: sender.email,
+          to: recipients,
+          subject: template.title,
+          body: template.htmlCode,
+        });
+        if (result) {
+          await EmailLogs.create({
+            campaign_id: job.data.campaign_id,
+            recipients,
+            template_id,
+            sender_id,
+            scheduled_time: new Date(scheduled_time),
+            status: result ? 'sent' : 'pending',
+            sent_at: new Date()
+          })
         }
-    },{connection});
-    
-    worker.on('ready', () => {
-        console.log('Worker connected to Redis and is ready to process jobs');
-    });
 
-}).catch((error)=>{
-    console.log('error',error);
+
+      } catch (error) {
+        console.error(`Error sending to ${recipients}:`, error);
+        await EmailLogs.create({
+          campaign_id: job.data.campaign_id,
+          recipients,
+          template_id,
+          sender_id,
+          scheduled_time: new Date(scheduled_time),
+          status: "failed",
+          sent_at: new Date(),
+        });
+
+      }
+
+
+    }
+  }, { connection });
+
+  worker.on('ready', () => {
+    console.log('Worker connected to Redis and is ready to process jobs');
+  });
+
+}).catch((error) => {
+  console.log('error', error);
 })

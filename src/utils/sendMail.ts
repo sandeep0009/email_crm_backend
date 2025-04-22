@@ -9,13 +9,19 @@ interface EmailOption {
 
 export async function sendEmail({ from, to, subject, body }: EmailOption) {
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
     auth: {
       user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+      pass: process.env.EMAIL_PASS  
     },
+    pool: true, 
+    maxConnections: 5, 
+    maxMessages: 100, 
+    rateDelta: 1000,
+    rateLimit: 5
   });
-
   const results = [];
 
   for (let recipient of to) {
@@ -27,7 +33,6 @@ export async function sendEmail({ from, to, subject, body }: EmailOption) {
         subject,
         html: body,
       });
-      console.log(`Email sent to ${recipient}: ${info.messageId}`);
       results.push({ recipient, success: true, messageId: info.messageId });
     } catch (error) {
       console.error(`Failed to send email to ${recipient}:`, error);
