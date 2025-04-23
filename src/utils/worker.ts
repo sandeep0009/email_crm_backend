@@ -9,7 +9,15 @@ import connectionDb from "../db/connection";
 import EmailLogs from "../models/emailLogsSchema";
 
 
-const connection = new IORedis({ maxRetriesPerRequest: null });
+const redisUrl = process.env.REDIS_URL;
+
+if (!redisUrl) {
+  throw new Error("REDIS_URL is not defined in environment variables.");
+}
+const connection =  new IORedis(redisUrl, {
+  maxRetriesPerRequest: null,
+});
+
 connectionDb().then(() => {
   const worker = new Worker('email_sender', async (job) => {
 
