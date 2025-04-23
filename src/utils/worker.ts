@@ -2,21 +2,14 @@ import { Worker } from "bullmq";
 import Template from "../models/templateSchema";
 import Senders from "../models/sendersSchema";
 import { sendEmail } from "./sendMail";
-import IORedis from "ioredis";
+import IORedis, { Redis } from "ioredis";
 
 import mongoose from "mongoose";
 import connectionDb from "../db/connection";
 import EmailLogs from "../models/emailLogsSchema";
 
 
-const redisUrl = process.env.REDIS_URL;
-
-if (!redisUrl) {
-  throw new Error("REDIS_URL is not defined in environment variables.");
-}
-const connection =  new IORedis(redisUrl, {
-  maxRetriesPerRequest: null,
-});
+const connection = new IORedis({ maxRetriesPerRequest: null });
 
 connectionDb().then(() => {
   const worker = new Worker('email_sender', async (job) => {
