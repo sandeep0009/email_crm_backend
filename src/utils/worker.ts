@@ -29,7 +29,7 @@ connectionDb().then(() => {
 
       try {
         const result = await sendEmail({
-          from: sender.email,
+          sender: sender,
           to: recipients,
           subject: template.title,
           body: template.htmlCode,

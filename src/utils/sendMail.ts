@@ -1,20 +1,25 @@
 import nodemailer from "nodemailer";
+import { ISender } from "../models/sendersSchema";
+import { decrypt } from "./encryption";
 
 interface EmailOption {
-  from: string;
+  sender: ISender;
   to: string[];
   subject: string;
   body: string;
 }
 
-export async function sendEmail({ from, to, subject, body }: EmailOption) {
+export async function sendEmail({ sender, to, subject, body }: EmailOption) {
+
+  const{smtp_host,smtp_port,smtp_pass,smtp_user,email}=sender;
+  const decryptPass=decrypt(smtp_pass)
   const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
+    host: smtp_host,
+    port: smtp_port,
     secure: false,
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS  
+      user: smtp_user,
+      pass: decryptPass 
     },
     pool: true, 
     maxConnections: 5, 
@@ -28,7 +33,7 @@ export async function sendEmail({ from, to, subject, body }: EmailOption) {
 
     try {
       const info = await transporter.sendMail({
-        from,
+        from:email,
         to: recipient,
         subject,
         html: body,
