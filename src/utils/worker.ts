@@ -13,7 +13,7 @@ const connection = new IORedis({ maxRetriesPerRequest: null });
 connectionDb().then(() => {
   const worker = new Worker('email_sender', async (job) => {
 
-    const { template: templates, recipients } = job.data;
+    const { template: templates, recipients,userId } = job.data;
 
     for (let temp of templates) {
 
@@ -35,29 +35,39 @@ connectionDb().then(() => {
           body: template.htmlCode,
         });
         if (result) {
-          await EmailLogs.create({
-            campaign_id: job.data.campaign_id,
-            recipients,
-            template_id,
-            sender_id,
-            scheduled_time: new Date(scheduled_time),
-            status: result ? 'sent' : 'pending',
-            sent_at: new Date()
-          })
+          for(let recipient_email of recipients){
+            await EmailLogs.create({
+              campaign_id: job.data.campaign_id,
+              recipient_email,
+              template_id,
+              sender_id,
+              scheduled_time: new Date(scheduled_time),
+              status: result ? 'sent' : 'pending',
+              sent_at: new Date(),
+              userId
+            })
+
+          }
+          
         }
 
 
       } catch (error) {
         console.error(`Error sending to ${recipients}:`, error);
-        await EmailLogs.create({
-          campaign_id: job.data.campaign_id,
-          recipients,
-          template_id,
-          sender_id,
-          scheduled_time: new Date(scheduled_time),
-          status: "failed",
-          sent_at: new Date(),
-        });
+        for(let recipient_email of recipients){
+          await EmailLogs.create({
+            campaign_id: job.data.campaign_id,
+            recipient_email,
+            template_id,
+            sender_id,
+            scheduled_time: new Date(scheduled_time),
+            status: 'failed',
+            sent_at: new Date(),
+            userId
+          })
+
+        }
+        
 
       }
 

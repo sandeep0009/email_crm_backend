@@ -11,6 +11,7 @@ export interface ICampaign extends Document {
     name: string;
     template: ITemplateEntry[];
     recipients: string[];
+    userId:ObjectId
 }
 
 
@@ -43,6 +44,10 @@ const campaignSchema=new Schema({
           required: true,
         },
     ],
+    userId:{
+            type:mongoose.Types.ObjectId,
+            ref:'User'
+    }
 },{timestamps:true});
 
 const Campaign=mongoose.model<ICampaign>('Campaign',campaignSchema);

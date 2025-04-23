@@ -1,9 +1,10 @@
 
-import mongoose, { Document,Schema } from "mongoose";
+import mongoose, { Document,ObjectId,Schema } from "mongoose";
 
 export interface ITemplate extends Document{
     title:string,
-    htmlCode:string
+    htmlCode:string,
+    userId:ObjectId
 }
 
 const templateSchema=new Schema<ITemplate>({
@@ -15,6 +16,10 @@ const templateSchema=new Schema<ITemplate>({
     htmlCode:{
         type:String,
         required:true
+    },
+    userId:{
+        type:mongoose.Types.ObjectId,
+        ref:'User'
     }
 },{timestamps:true});
 

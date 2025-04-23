@@ -2,13 +2,15 @@ import Template from "../../models/templateSchema";
 
 
 const create=async(
-    body:any
+    body:any,
+    id:string
 ):Promise<any>=>{
     const {title,htmlCode}=body;
 
     const createTemplate=await Template.create({
         title,
-        htmlCode
+        htmlCode,
+        userId:id
     });
 
 
@@ -16,8 +18,8 @@ const create=async(
 
 }
 
-const findAll=async():Promise<any>=>{
-    const data=await Template.find();
+const findAll=async(userId:string):Promise<any>=>{
+    const data=await Template.find({userId});
     return data;
 
 }

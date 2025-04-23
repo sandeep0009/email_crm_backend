@@ -7,7 +7,11 @@ export const createTemplate=async(
     res:Response
 ):Promise<any>=>{
     try {
-        const data =await service.create(req.body);
+        const userId = req.userId;
+        if(!userId){
+            return res.status(400).json({message:"INVALID Request"});
+        }
+        const data =await service.create(req.body,userId);
         if(!data){
             return res.status(404).json({message:STATUS_ERROR.DATA_ERROR});
         }
@@ -26,7 +30,11 @@ export const getTemplate=async(
     res:Response
 ):Promise<any>=>{
     try {
-        const data=await service.findAll();
+        const id=req.userId;
+        if(!id){
+            return res.status(400).json({message:"INVALID Request"});
+        }
+        const data=await service.findAll(id);
         if(!data){
             return res.status(404).json({message:STATUS_ERROR.DATA_ERROR});
         }

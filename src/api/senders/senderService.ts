@@ -3,7 +3,8 @@ import { encrypt } from "../../utils/encryption";
 
 
 const create=async(
-    body:any
+    body:any,
+    id:string
 ):Promise<any>=>{
     const {email,smtp_host,smtp_port,smtp_user,smtp_pass}=body;
 
@@ -13,7 +14,8 @@ const create=async(
         smtp_host,
         smtp_port,
         smtp_user,
-        smtp_pass:encryptedDetail
+        smtp_pass:encryptedDetail,
+        userId:id
     });
 
     return new_sender;
@@ -21,8 +23,8 @@ const create=async(
 }
 
 
-const findAll=async():Promise<any>=>{
-    const data=await Senders.find();
+const findAll=async(userId:string):Promise<any>=>{
+    const data=await Senders.find({ userId });
     return data;
 
 }

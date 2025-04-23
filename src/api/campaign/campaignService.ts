@@ -4,7 +4,8 @@ import { calculateDelay } from "../../utils/util";
 
 
 const create=async(
-    body:any
+    body:any,
+    id:string
 ):Promise<any>=>{
     const {name,template,recipients}=body;
  
@@ -12,7 +13,8 @@ const create=async(
         {
             name,
             template,
-            recipients
+            recipients,
+            userId:id
         }
     );
 

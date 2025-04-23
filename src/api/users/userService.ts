@@ -23,7 +23,7 @@ const signUp=async(
     });
 
     const token = jwt.sign(
-        { id: newUser._id, email: newUser.email },
+        { userId: newUser._id, email: newUser.email },
         JWT_SECRET,
         { expiresIn: '1d' }
     );
@@ -48,7 +48,7 @@ const signIn=async(
     }
 
     const token = jwt.sign(
-        { id: user._id, email: user.email},
+        { userId: user._id, email: user.email},
         JWT_SECRET,
         { expiresIn: '1d' }
     );

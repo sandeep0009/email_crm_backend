@@ -9,6 +9,7 @@ export interface IEmailLogs extends Document {
   scheduled_time: Date;
   status: "pending" | "failed" | "sent";
   sent_at: Date;
+  userId:ObjectId
 }
 
 const emailLogSchema = new Schema<IEmailLogs>(
@@ -19,7 +20,6 @@ const emailLogSchema = new Schema<IEmailLogs>(
     },
     recipient_email: {
       type: String,
-      required: true,
     },
     template_id: {
       type: mongoose.Types.ObjectId,
@@ -42,6 +42,10 @@ const emailLogSchema = new Schema<IEmailLogs>(
       type: Date,
       required: true,
     },
+    userId:{
+            type:mongoose.Types.ObjectId,
+            ref:'User'
+    }
   },
   { timestamps: true }
 );
