@@ -9,7 +9,10 @@ import connectionDb from "../db/connection";
 import EmailLogs from "../models/emailLogsSchema";
 
 
-const connection = new IORedis({ maxRetriesPerRequest: null });
+const redisUrl = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+
+const connection = new IORedis(redisUrl, { maxRetriesPerRequest: null });
+
 
 connectionDb().then(() => {
   const worker = new Worker('email_sender', async (job) => {
