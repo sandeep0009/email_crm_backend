@@ -11,6 +11,8 @@ import EmailLogs from "../models/emailLogsSchema";
 
 const redisUrl = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
 
+console.log(redisUrl)
+
 const connection = new IORedis(redisUrl, { maxRetriesPerRequest: null });
 
 
